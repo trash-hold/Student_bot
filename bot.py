@@ -37,6 +37,58 @@ def get_url(predifned = False):
                 url = url_hardcode[n]
         return url
 
+@client.event
+async def on_guild_join(guild):
+        '''
+        When joining new guild bot will:
+        1. Send welcome message
+        2. Add administrator role with highest hierarchy
+        3. Create a config channel for admins only 
+        '''
+        members = guild.members
+        channels = guild.text_channels
+
+        if channels == None:
+                await guild.create_text_channel('ogólny')
+
+        for i in channels:
+                if (str(i.name) == 'ogólny' or str(i.name) == 'general'): await i.send('Student bot zatoczył się na Twój serwer!')
+        
+        admin = await guild.create_role(name = 'Główny student debil', hoist = True, colour = d.Colour.gold())
+        for i in members:
+                if i.guild_permissions.administrator == True: await i.add_role(admin)
+        
+        overwrites = {
+                guild.default_role: d.PermissionOverwrite(read_messages=False),
+                admin: d.PermissionOverwrite(read_messages=True)
+        }
+        await guild.create_text_channel(name = 'ustawienia', overwrites = overwrites)
+
+
+
+@bot.command(name='sim')
+async def test(ctx):
+        guild = bot.get_guild(ctx.guild.id)
+        members = guild.members
+        channels = guild.text_channels
+
+        if channels == None:
+                await guild.create_text_channel('ogólny')
+
+        for i in channels:
+                if (str(i.name) == 'ogólny' or str(i.name) == 'general'): await i.send('Student bot zatoczył się na Twój serwer!')
+        
+        admin = await guild.create_role(name = 'Główny student debil', hoist = True, colour = d.Colour.gold())
+        for i in members:
+                if i.guild_permissions.administrator == True: await i.add_roles(admin)
+        
+        overwrites = {
+                guild.default_role: d.PermissionOverwrite(read_messages=False),
+                admin: d.PermissionOverwrite(read_messages=True)
+        }
+        await guild.create_text_channel(name = 'ustawienia', overwrites = overwrites)
+
+
 @bot.listen('on_message')
 async def background(ctx):
         cheers = ('jeb', 'pierdol', 'chuj')
