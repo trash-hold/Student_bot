@@ -23,44 +23,32 @@ client = d.Client(intents=intents)
 bot = commands.Bot(intents = intents, command_prefix = '/')
 tree = app_commands.CommandTree(client)
 
-'''class Test(app_commands.Group):
-
-        @app_commands.command()
-        @app_commands.describe(test = 'Test of sync')
-        async def test(self, interaction: d.Interaction):
-                await interaction.response.send_message('I guess it worked!')
-'''
-
-@bot.tree.command()
-async def test(interaction: d.Interaction):
-        await interaction.response.send_message('FUCK OFF')
-
-@bot.tree.command()
-async def hihi(interaction: d.Interaction):
-        await interaction.response.send_message('MICHEAL?')
-
 @bot.command(name = 'sync')
 @commands.is_owner()
 async def synccmd(ctx: commands.Context):
         bot.tree.copy_global_to(guild = ctx.guild)
         tmp = await bot.tree.sync(guild = ctx.guild)
         await ctx.send(f'Student debil przypomniał sobie {len(tmp)} komend!')
+        await ctx.send('Succesfully synced!')
 
 @bot.command(name = 'unsync')
 @commands.is_owner()
 async def unsynccmd(ctx: commands.Context):
         bot.tree.clear_commands(guild = ctx.guild)
         await bot.tree.sync(guild = ctx.guild)
+        await ctx.send('Succesfully unsynced!')
 
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def load(ctx, extenstion):
         await bot.load_extension(f'cogs.{extenstion}')
+        await ctx.send(f'{extenstion} loaded')
 
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def unload(ctx, extenstion):
         await bot.unload_extension(f'cogs.{extenstion}')
+        await ctx.send(f'{extenstion} unloaded')
 
 @bot.command()
 @commands.has_permissions(administrator = True)

@@ -1,4 +1,5 @@
-from discord.ext import commands 
+from discord.ext import commands
+from discord import app_commands 
 import discord as d
 import asyncio
 import aiohttp
@@ -25,18 +26,18 @@ def get_url(predifned = False):
         return url
 
 class Podstawowe(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot 
 
-    @commands.command()
-    async def student(self, ctx):
+    @app_commands.command()
+    async def student(self, interaction: d.Interaction):
         '''
         Odpowiedź na odwieczne filozoficzne pytanie o esencję ludzkiego bytu - kim jestem?
         '''  
-        await ctx.reply('debil')
+        await interaction.message.reply('debil')
 
-    @commands.command()
-    async def debil(self, ctx):
+    @app_commands.command()
+    async def debil(self, interaction: d.Interaction):
             '''
             Wstąp na drogę oświecenia
             '''
@@ -45,21 +46,27 @@ class Podstawowe(commands.Cog):
             if response.status_code == 200:
                     soup = BeautifulSoup(response.content, 'html.parser')
                     title = soup.find(id='firstHeading')
-                    await ctx.send(f"Dla własnego dobra przeczytaj o: {title.string} \n {str(response.url)}")
+                    await interaction.response.send_message(f"Dla własnego dobra przeczytaj o: {title.string} \n {str(response.url)}")
             else:
-                    await ctx.send("Once a student, always a debil")
+                    await interaction.response.send_message("Once a student, always a debil")
     
-    @commands.command()
-    async def papiesh(self, ctx):
-        #await ctx.send("debil")
+
+    @app_commands.command()
+    @app_commands.checks.has_permissions(administrator = True)
+    async def papiesh(self, interaction: d.Interaction):
+        '''
+        Student bot ma dla Ciebie miłą niespodziankę
+        '''
+        #await interaction.response.send_message("debil")
         url = get_url()
-        channel = self.bot.get_channel(ctx.channel.id)
+        channel = self.bot.get_channel(interaction.channel_id)
         async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                         if resp.status != 200:
                                 return await channel.send('Could not download file...')
                         data = io.BytesIO(await resp.read())
-                        await channel.send(file=d.File(data,'papa.png'))
+                        await interaction.response.send_message(file=d.File(data,'papa.png'))
+
 
 
 async def setup(bot):
